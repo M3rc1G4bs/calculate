@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora iOS</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            user-select: none;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #000;
+        }
+
+        .calculator {
+            width: 100%;
+            max-width: 375px;
+            height: 667px;
+            background-color: #000;
+            border-radius: 30px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+        }
+
+        .display {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            align-items: flex-end;
+            padding: 20px;
+            color: white;
+        }
+
+        .previous-operand {
+            font-size: 24px;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 8px;
+            min-height: 28px;
+            word-break: break-all;
+            text-align: right;
+        }
+
+        .current-operand {
+            font-size: 64px;
+            font-weight: 300;
+            word-break: break-all;
+            text-align: right;
+        }
+
+        .buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            grid-gap: 12px;
+            padding: 10px;
+        }
+
+        .btn {
+            width: 100%;
+            height: 70px;
+            border-radius: 50%;
+            border: none;
+            font-size: 32px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn:active {
+            transform: scale(0.95);
+            opacity: 0.8;
+        }
+
+        .btn-gray {
+            background-color: #a5a5a5;
+            color: #000;
+        }
+
+        .btn-dark {
+            background-color: #333;
+            color: white;
+        }
+
+        .btn-orange {
+            background-color: #ff9f0a;
+            color: white;
+        }
+
+        .btn-zero {
+            grid-column: span 2;
+            border-radius: 35px;
+            justify-content: flex-start;
+            padding-left: 30px;
+        }
+
+        .btn-active {
+            background-color: white;
+            color: #ff9f0a;
+        }
+    </style>
+</head>
+<body>
+    <div class="calculator">
+        <div class="display">
+            <div class="previous-operand" id="previous-operand"></div>
+            <div class="current-operand" id="current-operand">0</div>
+        </div>
+        <div class="buttons">
+            <button class="btn btn-gray" onclick="clearAll()">AC</button>
+            <button class="btn btn-gray" onclick="toggleSign()">+/-</button>
+            <button class="btn btn-gray" onclick="percentage()">%</button>
+            <button class="btn btn-orange" onclick="chooseOperation('/')">÷</button>
+            
+            <button class="btn btn-dark" onclick="appendNumber('7')">7</button>
+            <button class="btn btn-dark" onclick="appendNumber('8')">8</button>
+            <button class="btn btn-dark" onclick="appendNumber('9')">9</button>
+            <button class="btn btn-orange" onclick="chooseOperation('*')">×</button>
+            
+            <button class="btn btn-dark" onclick="appendNumber('4')">4</button>
+            <button class="btn btn-dark" onclick="appendNumber('5')">5</button>
+            <button class="btn btn-dark" onclick="appendNumber('6')">6</button>
+            <button class="btn btn-orange" onclick="chooseOperation('-')">−</button>
+            
+            <button class="btn btn-dark" onclick="appendNumber('1')">1</button>
+            <button class="btn btn-dark" onclick="appendNumber('2')">2</button>
+            <button class="btn btn-dark" onclick="appendNumber('3')">3</button>
+            <button class="btn btn-orange" onclick="chooseOperation('+')">+</button>
+            
+            <button class="btn btn-dark btn-zero" onclick="appendNumber('0')">0</button>
+            <button class="btn btn-dark" onclick="appendNumber('.')">.</button>
+            <button class="btn btn-orange" onclick="compute()">=</button>
+        </div>
+    </div>
+
+    <script>
+        let currentOperand = '0';
+        let previousOperand = '';
+        let operation = undefined;
+        let resetScreen = false;
+
+        const currentOperandElement = document.getElementById('current-operand');
+        const previousOperandElement = document.getElementById('previous-operand');
+
+        function updateDisplay() {
+            currentOperandElement.innerText = currentOperand;
+            previousOperandElement.innerText = previousOperand;
+        }
+
+        function appendNumber(number) {
+            if (currentOperand === '0' || resetScreen) {
+                currentOperand = '';
+                resetScreen = false;
+            }
+            
+            if (number === '.' && currentOperand.includes('.')) return;
+            
+            currentOperand += number;
+            updateDisplay();
+        }
+
+        function chooseOperation(op) {
+            if (currentOperand === '') return;
+            if (previousOperand !== '') {
+                compute();
+            }
+            
+            operation = op;
+            previousOperand = `${currentOperand} ${op}`;
+            currentOperand = '';
+            updateDisplay();
+        }
+
+        function compute() {
+            let computation;
+            const prev = parseFloat(previousOperand);
+            const current = parseFloat(currentOperand);
+            
+            if (isNaN(prev) || isNaN(current)) return;
+            
+            switch (operation) {
+                case '+':
+                    computation = prev + current;
+                    break;
+                case '-':
+                    computation = prev - current;
+                    break;
+                case '*':
+                    computation = prev * current;
+                    break;
+                case '/':
+                    computation = prev / current;
+                    break;
+                default:
+                    return;
+            }
+            
+            currentOperand = computation.toString();
+            operation = undefined;
+            previousOperand = '';
+            resetScreen = true;
+            updateDisplay();
+        }
+
+        function clearAll() {
+            currentOperand = '0';
+            previousOperand = '';
+            operation = undefined;
+            updateDisplay();
+        }
+
+        function toggleSign() {
+            currentOperand = (parseFloat(currentOperand) * -1).toString();
+            updateDisplay();
+        }
+
+        function percentage() {
+            currentOperand = (parseFloat(currentOperand) / 100).toString();
+            updateDisplay();
+        }
+
+        // Suporte para teclado
+        document.addEventListener('keydown', function(event) {
+            if (event.key >= '0' && event.key <= '9') {
+                appendNumber(event.key);
+            } else if (event.key === '.') {
+                appendNumber('.');
+            } else if (event.key === '+' || event.key === '-' || event.key === '*' || event.key === '/') {
+                chooseOperation(event.key);
+            } else if (event.key === 'Enter' || event.key === '=') {
+                compute();
+            } else if (event.key === 'Escape') {
+                clearAll();
+            } else if (event.key === '%') {
+                percentage();
+            } else if (event.key === 'Backspace') {
+                currentOperand = currentOperand.slice(0, -1);
+                if (currentOperand === '') currentOperand = '0';
+                updateDisplay();
+            }
+        });
+    </script>
+</body>
+</html>

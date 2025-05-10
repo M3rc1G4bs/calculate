@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -45,10 +46,10 @@
         }
 
         .previous-operand {
-            font-size: 24px;
+            font-size: 32px;
             color: rgba(255, 255, 255, 0.7);
             margin-bottom: 8px;
-            min-height: 28px;
+            min-height: 36px;
             word-break: break-all;
             text-align: right;
         }
@@ -113,6 +114,7 @@
         }
     </style>
 </head>
+
 <body>
     <div class="calculator">
         <div class="display">
@@ -124,22 +126,22 @@
             <button class="btn btn-gray" onclick="toggleSign()">+/-</button>
             <button class="btn btn-gray" onclick="percentage()">%</button>
             <button class="btn btn-orange" onclick="chooseOperation('/')">÷</button>
-            
+
             <button class="btn btn-dark" onclick="appendNumber('7')">7</button>
             <button class="btn btn-dark" onclick="appendNumber('8')">8</button>
             <button class="btn btn-dark" onclick="appendNumber('9')">9</button>
             <button class="btn btn-orange" onclick="chooseOperation('*')">×</button>
-            
+
             <button class="btn btn-dark" onclick="appendNumber('4')">4</button>
             <button class="btn btn-dark" onclick="appendNumber('5')">5</button>
             <button class="btn btn-dark" onclick="appendNumber('6')">6</button>
             <button class="btn btn-orange" onclick="chooseOperation('-')">−</button>
-            
+
             <button class="btn btn-dark" onclick="appendNumber('1')">1</button>
             <button class="btn btn-dark" onclick="appendNumber('2')">2</button>
             <button class="btn btn-dark" onclick="appendNumber('3')">3</button>
             <button class="btn btn-orange" onclick="chooseOperation('+')">+</button>
-            
+
             <button class="btn btn-dark btn-zero" onclick="appendNumber('0')">0</button>
             <button class="btn btn-dark" onclick="appendNumber('.')">.</button>
             <button class="btn btn-orange" onclick="compute()">=</button>
@@ -158,6 +160,13 @@
         function updateDisplay() {
             currentOperandElement.innerText = currentOperand;
             previousOperandElement.innerText = previousOperand;
+
+            // Ajusta o tamanho da fonte se o número for muito grande
+            if (currentOperand.length > 9) {
+                currentOperandElement.style.fontSize = '48px';
+            } else {
+                currentOperandElement.style.fontSize = '64px';
+            }
         }
 
         function appendNumber(number) {
@@ -165,9 +174,9 @@
                 currentOperand = '';
                 resetScreen = false;
             }
-            
+
             if (number === '.' && currentOperand.includes('.')) return;
-            
+
             currentOperand += number;
             updateDisplay();
         }
@@ -177,9 +186,9 @@
             if (previousOperand !== '') {
                 compute();
             }
-            
+
             operation = op;
-            previousOperand = `${currentOperand} ${op}`;
+            previousOperand = currentOperand;
             currentOperand = '';
             updateDisplay();
         }
@@ -188,9 +197,9 @@
             let computation;
             const prev = parseFloat(previousOperand);
             const current = parseFloat(currentOperand);
-            
+
             if (isNaN(prev) || isNaN(current)) return;
-            
+
             switch (operation) {
                 case '+':
                     computation = prev + current;
@@ -207,7 +216,7 @@
                 default:
                     return;
             }
-            
+
             currentOperand = computation.toString();
             operation = undefined;
             previousOperand = '';
@@ -233,7 +242,7 @@
         }
 
         // Suporte para teclado
-        document.addEventListener('keydown', function(event) {
+        document.addEventListener('keydown', function (event) {
             if (event.key >= '0' && event.key <= '9') {
                 appendNumber(event.key);
             } else if (event.key === '.') {
@@ -254,4 +263,5 @@
         });
     </script>
 </body>
+
 </html>
